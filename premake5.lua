@@ -1,38 +1,35 @@
 -- premake5.lua
 -- https://git-scm.com/book/en/v2/Git-Tools-Submodules
-workspace "CachapaDS"
-   architecture "x64"
-   startproject "PressF"
-   configurations { "Debug", "Release", "Dist"}
+
 
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+libName = "CachapaDS"
+libType = "StaticLib" -- uncomment for .lib 
+-- libType = "SharedLib" -- uncomment for dll
+appName = "Playground"
 
-project "PressF"
-   kind "StaticLib"
+workspace(libName)
+   architecture "x64"
+   startproject(appName)
+   configurations { "Debug", "Release", "Dist"}
+
+
+
+
+project(libName)
+   location(libName)
+   kind (libType)
    language "C++"
-   cppdialect "C++17" --StaticLib
+   cppdialect "C++17"
 
    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
-   
+
    files { 
-
+      "%{prj.name}/src/**.cpp",
+      "%{prj.name}/cds/**.h",
    }
-
-   includedirs {
-
-   }
-
-   libdirs
-   {
-
-   }
-
-   links {
-
-   }
-
 
    filter "configurations:Debug"
       defines { "_CRT_SECURE_NO_WARNINGS", "DEBUG"}
@@ -43,15 +40,29 @@ project "PressF"
       optimize "On"
 
 
-project "TestPlayground"
+
+project(appName)
+   location(appName)
    kind "ConsoleApp"
    language "C++"
    cppdialect "C++17" --StaticLib
 
    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+
+   includedirs{
+      libName
+   }
+   links{libName}
    
-   
+   files { 
+      "%{prj.name}/*/**.cpp",
+   }
+
    filter "configurations:Debug"
       defines { "DEBUG" }
       symbols "On"
+   
+   filter "system:windows"
+		systemversion "latest"

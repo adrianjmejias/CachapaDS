@@ -5,7 +5,7 @@
 namespace cds{
     template <class TT>
 	class FibHeap {
-		size_t size = 0;
+		
 
 
 

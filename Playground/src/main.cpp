@@ -6,6 +6,11 @@
 #include <memory>
 
 
+#define CDS_ASSERT(x) if(!(x)){\
+std::cout<<#x<<std::endl;\
+std::cout<<__LINE__<<std::endl;\
+}\
+
 
 struct Dummy {
 	std::string name;
@@ -17,28 +22,33 @@ struct DummyBinHeap {
 	DummyBinHeap(int val): _val(val) {}
 };
 
-int main() 
+int main()
 {
-	std::unique_ptr<cds::AbstractHeap<DummyBinHeap>> heap(new cds::BinHeap<DummyBinHeap>([](DummyBinHeap a, DummyBinHeap b)-> bool {return a._val < b._val; }));
+	std::unique_ptr<cds::AbstractHeap<DummyBinHeap> > heaps[] = {
+		std::make_unique<cds::FibHeap<DummyBinHeap>>([](DummyBinHeap a, DummyBinHeap b)-> bool {return a._val < b._val; }),
+		std::make_unique<cds::BinHeap<DummyBinHeap>>([](DummyBinHeap a, DummyBinHeap b)-> bool {return a._val < b._val; }),
+	};
 
-	heap->emplace(0);
-	heap->emplace(1);
-	heap->emplace(3);
-	heap->emplace(7);
-	heap->emplace(-30);
+	for (size_t ii = 1; ii < 2; ii++)
+	{
+		auto heap = heaps[ii].get();
 
-	std::cout <<"Size :"<< heap->size() << std::endl;
-	std::cout <<"Top :"<< heap->top()._val << std::endl;
-	heap->pop();
+		for (int ii = 0; ii < 100; ii++) {
+			heap->emplace(ii);
+		}
+
+		while (!heap->empty())
+		{
+			std::cout << "Size :" << heap->size() << std::endl;
+			std::cout << "Top :" << heap->top()._val << std::endl;
+			heap->pop();
+		}
+	}
 
 
-	std::cout << "Size :" << heap->size() << std::endl;
-	std::cout << "Top :" << heap->top()._val << std::endl;
-	heap->pop();
 
-	std::cout << "Size :" << heap->size() << std::endl;
-	std::cout << "Top :" << heap->top()._val << std::endl;
 
-	std::cin.ignore();
+	
+
 
 }

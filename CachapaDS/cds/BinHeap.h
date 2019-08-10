@@ -9,81 +9,20 @@ namespace cds {
 		template <typename TT>
 		class BinHeapNode {
 			using Node = BinHeapNode<TT>;
-			Node *_parent{ nullptr };
-			size_t _order{ 0 };
-			bool _dishonor{ false };
-
 		public:
-			
-			Node *_left{ this };
-			Node *_right{ this };
-			Node *_leftmostChild{ nullptr };
+			std::vector<Node*> childs;
 			TT _data;
 			BinHeapNode(const TT & data) : _data(data){}
-
-
-			size_t Order() const { return _order; }
-
-			/*
-				uno 2 nodos.
-			*/
-			inline static void Link(Node* left, Node* right) {
-				left->_right = right;
-				right->_left = left;
-			}
-			inline void LinkL(Node* left) {
-				Link(left, this);
-			}
-			inline void LinkR(Node* right) {
-				Link(this, right);
-			}
+			size_t Order() const { return childs.size(); }
 
 			inline bool HasChildren() {
 				return Order() > 0;
 			}
 			void InsertAsChild(Node* toInsert)
 			{
-				Node* oldLeftest = _leftmostChild;
-				_leftmostChild = toInsert;
-				if (oldLeftest) 
-				{
-					oldLeftest->InsertAsBrother(toInsert);
-				}
-				else 
-				{
-					_leftmostChild->_parent = this;
-					_leftmostChild->_left = _leftmostChild;
-					_leftmostChild->_right = _leftmostChild;
-				}
-				
-				_order++;
+				childs.push_back(toInsert);
 			}
-			void InsertAsBrother(Node* toInsert)
-			{
-				Link(this->_left, toInsert);
-				Link(toInsert, this);
-				toInsert->_parent = _parent;
-			}
-			
-			void JoinBrothers() {
-				Link(this->_left, this->_right);
-			}
-			
-			std::tuple<Node*, Node*> PopPreparation() {
-				Node* leftmost = _leftmostChild;
-				Node* rightmost = _leftmostChild->_left; // es una lista circular XD
 
-				int order = static_cast<int>(_order);
-				Node* aux = _leftmostChild;
-				
-				while (order-- > 0) { 
-					aux->_dishonor = false;
-					aux->_parent = nullptr;
-					aux = aux->_right;
-				}
-				
-				return { leftmost, rightmost };
-			}
 		};
 	}
 
@@ -93,11 +32,12 @@ namespace cds {
 	class BinHeap : public AbstractHeap<TT>
 	{
 		using Node = internal::BinHeapNode<TT>;
-		Node* _top{nullptr};
-	
+		const int NONE = -1;
+		int _top{-1};
+		std::vector<Node*> roots;
 
-		void _UpdateTop(Node* a) {
-			if (_compare(a->_data, _top->_data)) {
+		void _UpdateTop(int a) {
+			if (_compare(roots[a]->_data, roots[_top]->_data)) {
 				_top = a;
 			}
 		}
@@ -105,27 +45,22 @@ namespace cds {
 		void _Consolidate() 
 		{
 			std::vector<Node*> consolidate;
-			std::queue<Node*> q;
-
-			Node* aux = _top->_right;
-
-			q.push(_top);
-
-			// lleno con todos los root nodes
-			while (aux != _top) {
-				q.push(aux);
-				aux = aux->_right;
-			}
+			std::deque<Node*> q(roots.begin(), roots.end());
 			
 			while (!q.empty()) 
 			{
 				Node* act = q.front();
-				q.pop();
-
+				q.pop_front();
+				
 				// make sure the order for this node exists
 				while (act->Order() >= consolidate.size()) { consolidate.push_back(nullptr); }
 
 				Node* &consOrder = consolidate[act->Order()];
+
+				if (consOrder == act) {
+					__debugbreak();
+				}
+
 
 				if (consOrder)
 				{
@@ -135,7 +70,7 @@ namespace cds {
 					}
 					
 					consOrder->InsertAsChild(act);
-					q.push(consOrder);
+					q.push_back(consOrder);
 					consOrder = nullptr;
 				}
 				else 
@@ -149,85 +84,75 @@ namespace cds {
 				consolidate.end()
 			);
 
-			for (int ii = 0, iiEnd = static_cast<int>(consolidate.size()) -1; ii < iiEnd; ii++) {
-				Node* l = consolidate[ii];
-				Node* r = consolidate[ii+1];
-				_UpdateTop(l);
-				l->LinkR(r);
+			roots.assign(consolidate.begin(), consolidate.end());
+
+			if (size() > 0) 
+			{
+				_top = 0;
+				for (int ii = 1, iiEnd = static_cast<int>(consolidate.size()); ii < iiEnd; ii++) {
+					_UpdateTop(ii);
+				}
 			}
-			//cerrando lista circular
-			Node* last = consolidate[consolidate.size() - 1];
-			Node* first = consolidate[0];
-			_UpdateTop(last);
-			last->LinkR(first);
+			else 
+			{
+				_top = NONE;
+			}
+
+
 		}
-		
+		BinHeap() : AbstractHeap([](const TT& a, const TT&b) {return true; }) {
+
+		}
 	public:
 		BinHeap(CompareFn comp) : AbstractHeap(comp) {
 
 		}
+
 		const TT& top() const
 		{
-			return _top->_data;
+			return roots[_top]->_data;
 		}
+
 		void push(const TT& data)
 		{
-			Node* toInsert = new Node(data);
-			if (_top) 
-			{
-				_top->InsertAsBrother(toInsert);
-				_UpdateTop(toInsert);
-			}
-			else 
-			{
-				_top = toInsert;
+			Node* nNode = new Node(data);
+
+			if (_top == NONE) {
+				_top = 0; //first pos
 			}
 
+			roots.push_back(nNode);
 			_size++;
+
+			_Consolidate();
 		}
 		
 		void pop()
 		{
-			Node *poppedTop = _top;
 			
-			if (!poppedTop) return;
+			if (_top == NONE) return;
+			Node* poppedTop = roots[_top];
+			
+			//saco
+			std::swap(roots[_top], roots[roots.size() - 1]);
+			roots.pop_back();
 
-			// Si no es el unico root node
-			if (poppedTop->_left != poppedTop) 
-			{
-				// ningun root node tiene referencia a el
-				if (poppedTop->HasChildren()) 
-				{
-					Node* wrapLeft{ poppedTop->_left};
-					Node* wrapRight{ poppedTop};
-					
-					auto [leftmost, rightmost] = poppedTop->PopPreparation();
-					
-					wrapLeft->LinkR(leftmost);
-					wrapRight->LinkL(rightmost);
-				}
-				
-				_top = poppedTop->_left;
-				poppedTop->JoinBrothers();
-			}
-			else
-			{
-				//si tengo o no tengo hijos no importa
-				//será nullptr o será mi hijo
-				_top = poppedTop->_leftmostChild;
-			}
-			_size--;
+			//pego hijos
+
+
+			std::copy(poppedTop->childs.begin(), poppedTop->childs.end(), std::back_inserter(roots));
+			_size--;	
 			
-			if (size() > 0) 
-			{
-				_Consolidate();
-			}
-			else 
-			{
-				_top = nullptr;
-			}
-			
+			_Consolidate();
+
 			delete poppedTop;
 		}
-	};
+
+		void Merge(const BinHeap& other) {
+			std::copy(other.roots.begin(), other.roots.end(), std::back_inserter(roots));
+			_size += other.size();
+			_Consolidate();
+		}
+
+};
 }

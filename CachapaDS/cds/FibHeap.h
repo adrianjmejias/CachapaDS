@@ -56,7 +56,6 @@ namespace cds {
 					_leftmostChild->_right = _leftmostChild;
 				}
 
-
 				_order++;
 			}
 			void InsertAsBrother(Node* toInsert)

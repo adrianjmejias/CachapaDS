@@ -33,8 +33,9 @@ namespace cds {
 
 
 
-	class Mergeable {
-
+	class MergeHeap 
+	{
+		virtual void Merge(MergeHeap&) = 0;
 	};
 
 

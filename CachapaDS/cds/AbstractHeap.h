@@ -20,12 +20,12 @@ namespace cds {
 		virtual size_t size() const final { return _size; };
 		virtual const TT& top() const = 0;
 		virtual void push(const TT& data) = 0;
+		virtual void pop() = 0;
 
 		template <class... Args> 
 		void emplace(Args&&... args) {
 			push(TT(std::forward<Args>(args)...));
 		}
-		virtual void pop() = 0;
 	};
 
 

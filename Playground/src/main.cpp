@@ -3,6 +3,7 @@
 
 #include <cds/FibHeap.h>
 #include <cds/BinHeap.h>
+#include <cds/BinaryHeap.h>
 #include <memory>
 
 
@@ -27,9 +28,10 @@ int main()
 	std::unique_ptr<cds::AbstractHeap<DummyBinHeap> > heaps[] = {
 		std::make_unique<cds::FibHeap<DummyBinHeap>>([](DummyBinHeap a, DummyBinHeap b)-> bool {return a._val < b._val; }),
 		std::make_unique<cds::BinHeap<DummyBinHeap>>([](DummyBinHeap a, DummyBinHeap b)-> bool {return a._val < b._val; }),
+		std::make_unique<cds::BinaryHeap<DummyBinHeap>>([](DummyBinHeap a, DummyBinHeap b)-> bool {return a._val < b._val; }),
 	};
 
-	for (size_t ii = 1; ii < 2; ii++)
+	for (size_t ii = 1; ii < 3; ii++)
 	{
 		auto heap = heaps[ii].get();
 

@@ -53,25 +53,25 @@ namespace cds {
 	public:
 		virtual const TT& top() const 
 		{
-			// TODO: throw exception if empty
-			//return elements[0];
+			 // TODO: throw exception if empty
+			return elements[0]; 
 		};
 
 
 		virtual void push(const TT& data) 
 		{
 
-			//elements.push_back(data);
-			////_Float(size);
-			//_size++;
-
+			elements.push_back(data);
+			_size = elements.size();
+			_Float(size - 1);
 		};
 
 		virtual void pop() 
 		{
-		/*	std::swap(elements[0], elements[_size - 1]);
-			_size--;*/
-			//_Sink(0);
+			std::swap(elements[0], elements[_size - 1]);
+			elements.pop_back();
+			_size = elements.size();
+			_Sink(0);
 		};
 	};
 

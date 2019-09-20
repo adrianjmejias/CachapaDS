@@ -11,10 +11,9 @@ namespace cds {
 		using DataContainer = std::vector<TT>;
 		DataContainer elements;
 
-
 		int _l(int idx)
 		{
-			return idx << 1+ 1;
+			return (idx << 1) + 1;
 		}
 		int _r(int idx) {
 			return _l(idx) + 1;
@@ -26,31 +25,26 @@ namespace cds {
 
 		void _Sink(int e)
 		{
-			//while (2 * k <= n) {
-			//	int j = 2 * k;
+			// if left child exists
+			//for (int lIndex = _l(e); false ;)
+			//{
 
-			//	if (j < n && A[j]<A[j + 1]) j++;
-			//	if (A[k] >= A[j]) break;
-			//	swap(A[k], A[j]);
-			//	k = j;
 			//}
 		}
 		void _Float(int k)
 		{
-			
-			//while (
-			//	(int pIndex = _p(k) >=0) // exists parent
-			//	&& _compare(elements[k], elements[pIndex])
-			//	)
+			// exists parent
+			//for (int pIndex = _p(k); pIndex >= 0 && _compare(elements[k], elements[pIndex]); pIndex = _p(k))
 			//{
-
-
-
-
+			//	std::swap(elements[k], elements[pIndex]);
+			//	k = pIndex;
 			//}
 		}
 
 	public:
+		BinaryHeap(CompareFn comp) : AbstractHeap(comp) {
+
+		}
 		virtual const TT& top() const 
 		{
 			 // TODO: throw exception if empty
@@ -60,10 +54,9 @@ namespace cds {
 
 		virtual void push(const TT& data) 
 		{
-
 			elements.push_back(data);
 			_size = elements.size();
-			_Float(size - 1);
+			_Float(static_cast<int>(_size - 1));
 		};
 
 		virtual void pop() 

@@ -25,20 +25,41 @@ namespace cds {
 
 		void _Sink(int e)
 		{
+			int rIndex;
+			int swapWithIndex;
 			// if left child exists
-			//for (int lIndex = _l(e); false ;)
-			//{
+			while ((swapWithIndex = _l(e)) < _size)
+			{
+				rIndex = swapWithIndex + 1;
+				if (rIndex < _size) 
+				{
+					if (this->_compare(elements[rIndex], elements[swapWithIndex]))
+					{
+						swapWithIndex = rIndex;
+					}
+				}
 
-			//}
+
+				if (this->_compare(elements[e], elements[swapWithIndex]))
+				{
+					std::swap(elements[e], elements[swapWithIndex]);
+				}
+				else
+				{
+					e = _size; // break
+				}
+
+			}
 		}
 		void _Float(int k)
 		{
-			// exists parent
-			//for (int pIndex = _p(k); pIndex >= 0 && _compare(elements[k], elements[pIndex]); pIndex = _p(k))
-			//{
-			//	std::swap(elements[k], elements[pIndex]);
-			//	k = pIndex;
-			//}
+			//exists parent
+			int pIndex;
+			while ((pIndex = _p(k)) >= 0 && _compare(elements[k], elements[pIndex]))
+			{
+				std::swap(elements[k], elements[pIndex]);
+				k = pIndex;
+			}
 		}
 
 	public:

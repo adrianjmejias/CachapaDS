@@ -23,6 +23,12 @@ struct DummyBinHeap {
 	DummyBinHeap(int val): _val(val) {}
 };
 
+std::ostream& operator<<(std::ostream& out, const DummyBinHeap& d)
+{
+	out << d._val;
+	return out;
+}
+
 int main()
 {
 	std::unique_ptr<cds::AbstractHeap<DummyBinHeap> > heaps[] = {

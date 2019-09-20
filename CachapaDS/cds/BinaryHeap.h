@@ -31,6 +31,11 @@ namespace cds {
 			while ((swapWithIndex = _l(e)) < _size)
 			{
 				rIndex = swapWithIndex + 1;
+
+
+				//std::cout << "Sink(" << e << ") l->" << swapWithIndex << "    r->" << rIndex << std::endl;
+				//std::cout << "Sink(" << elements[e] << ") l->"<< elements[swapWithIndex] <<"    r->"<< elements[rIndex] << std::endl;
+				//
 				if (rIndex < _size) 
 				{
 					if (this->_compare(elements[rIndex], elements[swapWithIndex]))
@@ -40,13 +45,14 @@ namespace cds {
 				}
 
 
-				if (this->_compare(elements[e], elements[swapWithIndex]))
+				if (this->_compare(elements[swapWithIndex], elements[e]))
 				{
 					std::swap(elements[e], elements[swapWithIndex]);
+					e = swapWithIndex;
 				}
 				else
 				{
-					e = _size; // break
+					break;
 				}
 
 			}

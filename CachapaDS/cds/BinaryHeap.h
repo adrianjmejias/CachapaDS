@@ -93,6 +93,7 @@ namespace cds {
 			_size = elements.size();
 			_Sink(0);
 		};
+
 	};
 
 }

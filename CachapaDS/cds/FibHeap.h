@@ -1,7 +1,7 @@
 #pragma once
 #include "AbstractHeap.h"
 
-
+#include <iostream>
 namespace cds {
 
 	namespace internal
@@ -90,7 +90,7 @@ namespace cds {
 
 
 	template <typename TT>
-	class FibHeap : public AbstractHeap<TT>
+	class FibHeap : public AbstractHeap<TT>, Mergeable
 	{
 		using Node = internal::FibHeapNode<TT>;
 		Node* _top{ nullptr };
@@ -101,7 +101,6 @@ namespace cds {
 				_top = a;
 			}
 		}
-
 		void _Consolidate()
 		{
 			std::vector<Node*> consolidate;
@@ -185,7 +184,6 @@ namespace cds {
 
 			_size++;
 		}
-
 		void pop()
 		{
 			Node *poppedTop = _top;
@@ -229,6 +227,19 @@ namespace cds {
 
 			delete poppedTop;
 		}
-	};
+
+		// Inherited via Mergeable
+		virtual void Merge(const Mergeable &m) override
+		{
+
+			if (const FibHeap* fib = dynamic_cast<const FibHeap*>(&m))
+			{
+				std::cout << "ejejjeje" << std::endl;
+			}
+			
+
+
+		}
+};
 
 }

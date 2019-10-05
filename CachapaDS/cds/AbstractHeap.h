@@ -56,19 +56,7 @@ namespace cds {
 
 
 
-
-	class MergeHeap 
-	{
-		virtual void Merge(MergeHeap&) = 0;
+	class Mergeable {
+		virtual void Merge(const Mergeable&) = 0;
 	};
-
-
-	namespace internal{
-		const int LEFT = 0, RIGHT = 1;
-		class AbstractNode {
-
-		};
-	}
-
-
 }
